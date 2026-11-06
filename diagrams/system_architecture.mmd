@@ -1,0 +1,62 @@
+flowchart LR
+    subgraph TRUST[Trusted inputs and policy]
+        U[Trusted user task]
+        C[Deterministic capability builder]
+        R[(Immutable action registry<br/>blast-radius tiers)]
+        B[Authority budget<br/>resource + parameters + call count]
+        U --> C --> B
+        R --> B
+    end
+
+    subgraph UNTRUSTED[Untrusted context]
+        T[Support ticket<br/>may contain indirect prompt injection]
+    end
+
+    subgraph MODEL[Model loop]
+        M[Local tool-calling model<br/>Qwen3 / Llama 3.1 / Granite 4]
+        P[PROPOSED tool call]
+        M --> P
+    end
+
+    subgraph AUTH[Authority plane — deterministic]
+        N[Normalize + schema validate]
+        S[Compute B(a,c) and tier]
+        D{Policy decision}
+        N --> S --> D
+        B --> D
+    end
+
+    subgraph EXEC[Synthetic execution layer]
+        X[Synthetic tools<br/>read_ticket · send_email<br/>read_secret · delete_ticket]
+        E[(Structured event log)]
+        X --> E
+    end
+
+    subgraph EVIDENCE[Evidence and analysis]
+        J[JSONL provenance<br/>PROPOSED / EXECUTED / DENIED]
+        A[CSV aggregates<br/>RESULTS.md · talk chart]
+        J --> A
+    end
+
+    U --> M
+    T --> M
+    P --> N
+    D -->|ALLOW| X
+    D -->|DENY or REVIEW| E
+    P --> J
+    E --> J
+
+    M -. no direct execution path .-> X
+
+    classDef trusted fill:#dff7e8,stroke:#218838,color:#102a18
+    classDef untrusted fill:#ffe5e5,stroke:#c92a2a,color:#3b1111
+    classDef model fill:#dff4ff,stroke:#147aa3,color:#0a2633
+    classDef authority fill:#fff0d5,stroke:#c27b00,color:#3b2600
+    classDef evidence fill:#ece7ff,stroke:#6651b8,color:#20164d
+    class U,C,R,B trusted
+    class T untrusted
+    class M,P model
+    class N,S,D authority
+    class X,E trusted
+    class J,A evidence
+

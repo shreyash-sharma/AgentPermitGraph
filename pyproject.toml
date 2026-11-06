@@ -1,0 +1,27 @@
+[project]
+name = "agent-authority-experiment"
+version = "0.1.0"
+description = "Synthetic experiment separating model compromise from system compromise"
+requires-python = ">=3.11"
+dependencies = ["wasmtime>=38.0.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/authority_experiment"]
+
+[project.scripts]
+authority-experiment = "authority_experiment.runner:main"
+authority-analyze = "authority_experiment.analysis:main"
+authority-graph-demo = "authority_experiment.graph_demo:main"
+authority-graph-experiment = "authority_experiment.graph_runner:main"
+authority-graph-analyze = "authority_experiment.graph_analysis:main"
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
